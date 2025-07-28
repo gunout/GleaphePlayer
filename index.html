@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLEAPHE PLAYER</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-pink: #ff20a0;
+            --neon-blue: #20fcff;
+            --neon-purple: #bc13fe;
+            --matrix-pink: #ff00aa;
+            --glow-intensity: 0.8;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Matrice rose fluo */
+        .matrix-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: #000;
+            opacity: 0.9;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(12px, 1fr));
+            grid-template-rows: repeat(auto-fill, minmax(12px, 1fr));
+        }
+
+        .matrix-char {
+            color: var(--matrix-pink);
+            text-shadow: 0 0 3px var(--matrix-pink);
+            font-size: 11px;
+            text-align: center;
+            opacity: 0;
+            animation: matrix-fall 5s linear infinite;
+            animation-delay: calc(var(--delay) * 0.1s);
+        }
+
+        @keyframes matrix-fall {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { opacity: 0; transform: translateY(100vh); }
+        }
+
+        /* Effet Glitch sur le titre */
+        .glitch-effect {
+            position: relative;
+            animation: glitch-anim 2s infinite linear alternate;
+        }
+
+        .glitch-effect::before, .glitch-effect::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+        }
+
+        .glitch-effect::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--neon-pink);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch-effect::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--neon-blue);
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { text-shadow: 0 0 10px var(--neon-pink); }
+            20% { text-shadow: 5px 0 10px var(--neon-blue); }
+            40% { text-shadow: -5px 0 10px var(--neon-purple); }
+            60% { text-shadow: 5px 0 15px var(--neon-pink); }
+            80% { text-shadow: -5px 0 15px var(--neon-blue); }
+            100% { text-shadow: 0 0 20px var(--neon-purple); }
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip: rect(32px, 9999px, 12px, 0); }
+            10% { clip: rect(112px, 9999px, 76px, 0); }
+            20% { clip: rect(85px, 9999px, 23px, 0); }
+            30% { clip: rect(27px, 9999px, 97px, 0); }
+            40% { clip: rect(64px, 9999px, 98px, 0); }
+            50% { clip: rect(61px, 9999px, 85px, 0); }
+            60% { clip: rect(99px, 9999px, 114px, 0); }
+            70% { clip: rect(34px, 9999px, 115px, 0); }
+            80% { clip: rect(98px, 9999px, 129px, 0); }
+            90% { clip: rect(43px, 9999px, 96px, 0); }
+            100% { clip: rect(82px, 9999px, 64px, 0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(65px, 9999px, 119px, 0); }
+            10% { clip: rect(25px, 9999px, 145px, 0); }
+            20% { clip: rect(129px, 9999px, 38px, 0); }
+            30% { clip: rect(79px, 9999px, 133px, 0); }
+            40% { clip: rect(128px, 9999px, 99px, 0); }
+            50% { clip: rect(36px, 9999px, 15px, 0); }
+            60% { clip: rect(67px, 9999px, 115px, 0); }
+            70% { clip: rect(111px, 9999px, 74px, 0); }
+            80% { clip: rect(10px, 9999px, 2px, 0); }
+            90% { clip: rect(85px, 9999px, 97px, 0); }
+            100% { clip: rect(72px, 9999px, 45px, 0); }
+        }
+
+        /* Player style */
+        .radio-player {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 
+                0 0 10px rgba(255, 20, 160, var(--glow-intensity)),
+                0 0 20px rgba(255, 20, 160, var(--glow-intensity)),
+                0 0 40px rgba(255, 20, 160, var(--glow-intensity)),
+                inset 0 0 20px rgba(255, 20, 160, 0.3);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 20, 160, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: 80%;
+            max-width: 450px;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+
+        .radio-player:hover {
+            transform: scale(1.02);
+            --glow-intensity: 1;
+        }
+
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: white;
+            text-shadow: 
+                0 0 5px #fff,
+                0 0 10px var(--neon-pink),
+                0 0 20px var(--neon-pink),
+                0 0 40px var(--neon-purple);
+            animation: flicker 1.5s infinite alternate;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 
+                    0 0 5px #fff,
+                    0 0 10px var(--neon-pink),
+                    0 0 20px var(--neon-pink),
+                    0 0 40px var(--neon-purple);
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+            }
+        }
+
+        #currentSong {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: white;
+            text-shadow: 0 0 5px var(--neon-blue);
+            min-height: 1.8em;
+            text-transform: uppercase;
+        }
+
+        #artist, #title {
+            display: inline-block;
+            position: relative;
+        }
+
+        #artist::after {
+            content: " - ";
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Boutons avec Glow et Glitch */
+        button {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--neon-pink);
+            color: white;
+            border-radius: 50px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            box-shadow: 
+                0 0 5px rgba(255, 20, 160, 0.5),
+                inset 0 0 5px rgba(255, 20, 160, 0.3);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            width: 75%;
+            max-width: 180px;
+            text-transform: uppercase;
+            animation: button-glow 2s infinite alternate;
+        }
+
+        @keyframes button-glow {
+            0% { box-shadow: 0 0 5px rgba(255, 20, 160, 0.5), inset 0 0 5px rgba(255, 20, 160, 0.3); }
+            100% { box-shadow: 0 0 15px var(--neon-pink), inset 0 0 10px var(--neon-pink); }
+        }
+
+        button:hover {
+            background: rgba(255, 20, 160, 0.2);
+            transform: translateY(-3px);
+            animation: button-glitch 0.5s infinite alternate, button-glow 1s infinite alternate;
+        }
+
+        @keyframes button-glitch {
+            0% { transform: translateY(-3px) translateX(0); }
+            20% { transform: translateY(-3px) translateX(2px); }
+            40% { transform: translateY(-3px) translateX(-2px); }
+            60% { transform: translateY(-3px) translateX(1px); }
+            80% { transform: translateY(-3px) translateX(-1px); }
+            100% { transform: translateY(-3px) translateX(0); }
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 20, 160, 0.4),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload {
+            display: inline-block;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--neon-blue);
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 
+                0 0 5px rgba(32, 252, 255, 0.5),
+                inset 0 0 5px rgba(32, 252, 255, 0.3);
+            margin-bottom: 8px;
+            text-align: center;
+            width: 75%;
+            max-width: 180px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            position: relative;
+            overflow: hidden;
+            animation: button-glow-blue 2s infinite alternate;
+        }
+
+        @keyframes button-glow-blue {
+            0% { box-shadow: 0 0 5px rgba(32, 252, 255, 0.5), inset 0 0 5px rgba(32, 252, 255, 0.3); }
+            100% { box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px var(--neon-blue); }
+        }
+
+        .file-upload:hover {
+            background: rgba(32, 252, 255, 0.2);
+            transform: translateY(-3px);
+            animation: button-glitch 0.5s infinite alternate, button-glow-blue 1s infinite alternate;
+        }
+
+        .file-upload::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(32, 252, 255, 0.4),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .file-upload:hover::before {
+            left: 100%;
+        }
+
+        input[type="text"], input[type="range"] {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 50px;
+            border: 1px solid var(--neon-pink);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            width: 75%;
+            max-width: 300px;
+            transition: all 0.3s;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 
+                inset 0 0 5px rgba(255, 20, 160, 0.3),
+                0 0 5px rgba(255, 20, 160, 0.3);
+            text-transform: uppercase;
+        }
+
+        input[type="text"]:focus, input[type="range"]:focus {
+            outline: none;
+            box-shadow: 
+                inset 0 0 10px var(--neon-pink),
+                0 0 15px var(--neon-pink);
+            border-color: var(--neon-blue);
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 8px;
+            background: rgba(255, 20, 160, 0.2);
+            border-radius: 10px;
+            padding: 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-pink);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 
+                0 0 5px #fff,
+                0 0 10px var(--neon-pink);
+            transition: all 0.3s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--neon-blue);
+            transform: scale(1.1);
+        }
+
+        #playlist {
+            width: 75%;
+            max-width: 280px;
+            max-height: 120px;
+            overflow-y: auto;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--neon-purple);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        #playlist div {
+            padding: 5px;
+            color: white;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        #playlist div:hover {
+            background: rgba(255, 20, 160, 0.2);
+            transform: translateX(5px);
+        }
+
+        #playlist div.playing {
+            color: var(--neon-blue);
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--neon-blue);
+            animation: text-flicker 1s infinite alternate;
+        }
+
+        @keyframes text-flicker {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* Effet de scanlines */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+            animation: scanline 8s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        /* Adaptation mobile */
+        @media (max-width: 600px) {
+            .radio-player {
+                padding: 15px;
+                max-width: 90%;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-background" id="matrix"></div>
+    <div class="scanlines"></div>
+    
+    <div id="player" class="radio-player">
+        <h1 class="glitch-effect" data-text="GLEAPHE RADIO">GLEAPHE PLAYER</h1>
+        <div id="currentSong">
+            <span id="artist">AUCUN FICHIER</span><span id="title"></span>
+        </div>
+        
+        <audio id="audio" controls style="display: none;">
+            Votre navigateur ne supporte pas l'élément audio.
+        </audio>
+        
+        <div class="controls">
+            <input type="text" id="radioUrlInput" placeholder="URL DE LA RADIO">
+            <button id="loadRadioBtn">CONNECTER RADIO</button>
+            
+            <label for="fileInput" class="file-upload">
+                CHARGER FICHIERS AUDIO
+            </label>
+            <input type="file" id="fileInput" accept=".mp3,.wav,.flac,.ogg" multiple>
+            
+            <div id="playlist"></div>
+            
+            <button id="playBtn">PLAY</button>
+            <button id="pauseBtn" style="display: none;">PAUSE</button>
+            <button id="stopBtn">STOP</button>
+            <button id="prevBtn">PREC.</button>
+            <button id="nextBtn">SUIV.</button>
+            
+            <label for="volume" style="color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue);">VOLUME:</label>
+            <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+            
+            <label for="seekBar" style="color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue);">POSITION:</label>
+            <input type="range" id="seekBar" value="0" step="1">
+        </div>
+    </div>
+
+    <script>
+        // Éléments DOM
+        const audio = document.getElementById('audio');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const volumeControl = document.getElementById('volume');
+        const seekBar = document.getElementById('seekBar');
+        const fileInput = document.getElementById('fileInput');
+        const playlist = document.getElementById('playlist');
+        const artistElement = document.getElementById('artist');
+        const titleElement = document.getElementById('title');
+        const matrix = document.getElementById('matrix');
+        const radioUrlInput = document.getElementById('radioUrlInput');
+        const loadRadioBtn = document.getElementById('loadRadioBtn');
+        
+        // Variables pour la playlist
+        let currentTrack = 0;
+        let tracks = [];
+        let trackNames = [];
+        let isRadioMode = false;
+        
+        // Créer l'effet de matrice rose fluo
+        function createMatrixEffect() {
+            const chars = "01";
+            const columns = Math.floor(window.innerWidth / 15);
+            const rows = Math.floor(window.innerHeight / 15);
+            
+            for (let i = 0; i < columns * rows; i++) {
+                const char = document.createElement('div');
+                char.className = 'matrix-char';
+                char.textContent = chars[Math.floor(Math.random() * chars.length)];
+                char.style.setProperty('--delay', Math.random() * 50);
+                matrix.appendChild(char);
+            }
+        }
+        
+        // Charger une radio
+        loadRadioBtn.addEventListener('click', function() {
+            const radioUrl = radioUrlInput.value.trim();
+            if (!radioUrl) return;
+            
+            isRadioMode = true;
+            audio.src = radioUrl;
+            audio.load();
+            audio.play()
+                .then(() => {
+                    playBtn.style.display = 'none';
+                    pauseBtn.style.display = 'inline';
+                    updateSongInfo("RADIO EN DIRECT", radioUrl.toUpperCase());
+                })
+                .catch(error => {
+                    console.error("Erreur de connexion radio:", error);
+                    updateSongInfo("ERREUR RADIO", error.message.toUpperCase());
+                });
+        });
+        
+        // Charger les fichiers audio
+        fileInput.addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+            
+            isRadioMode = false;
+            tracks = [];
+            trackNames = [];
+            playlist.innerHTML = '';
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.match('audio.*')) continue;
+                
+                const trackUrl = URL.createObjectURL(file);
+                tracks.push(trackUrl);
+                trackNames.push(file.name.replace(/\.[^/.]+$/, "").toUpperCase());
+                
+                // Ajouter à la playlist
+                const trackElement = document.createElement('div');
+                trackElement.textContent = trackNames[i];
+                trackElement.addEventListener('click', () => {
+                    playTrack(i);
+                });
+                playlist.appendChild(trackElement);
+            }
+            
+            if (tracks.length > 0) {
+                playTrack(0);
+            }
+        });
+        
+        // Jouer une piste spécifique
+        function playTrack(index) {
+            if (index < 0 || index >= tracks.length) return;
+            
+            currentTrack = index;
+            audio.src = tracks[index];
+            audio.load();
+            audio.play()
+                .then(() => {
+                    playBtn.style.display = 'none';
+                    pauseBtn.style.display = 'inline';
+                    updateSongInfo("LECTURE", trackNames[index]);
+                    
+                    // Mettre en surbrillance la piste dans la playlist
+                    const playlistItems = playlist.children;
+                    for (let i = 0; i < playlistItems.length; i++) {
+                        playlistItems[i].classList.remove('playing');
+                    }
+                    playlistItems[index].classList.add('playing');
+                })
+                .catch(error => {
+                    console.error("Erreur de lecture:", error);
+                    updateSongInfo("ERREUR", error.message.toUpperCase());
+                });
+        }
+        
+        // Contrôles du player
+        playBtn.addEventListener('click', () => {
+            if (isRadioMode && audio.src) {
+                audio.play()
+                    .then(() => {
+                        playBtn.style.display = 'none';
+                        pauseBtn.style.display = 'inline';
+                        updateSongInfo("RADIO EN DIRECT", audio.src.toUpperCase());
+                    })
+                    .catch(error => {
+                        console.error("Erreur de lecture radio:", error);
+                        updateSongInfo("ERREUR RADIO", error.message.toUpperCase());
+                    });
+            } else if (tracks.length > 0) {
+                audio.play()
+                    .then(() => {
+                        playBtn.style.display = 'none';
+                        pauseBtn.style.display = 'inline';
+                        updateSongInfo("LECTURE", trackNames[currentTrack]);
+                    })
+                    .catch(error => {
+                        console.error("Erreur de lecture:", error);
+                        updateSongInfo("ERREUR", error.message.toUpperCase());
+                    });
+            }
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            audio.pause();
+            pauseBtn.style.display = 'none';
+            playBtn.style.display = 'inline';
+            if (isRadioMode) {
+                updateSongInfo("RADIO PAUSE", audio.src.toUpperCase());
+            } else {
+                updateSongInfo("PAUSE", trackNames[currentTrack]);
+            }
+        });
+        
+        stopBtn.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
+            pauseBtn.style.display = 'none';
+            playBtn.style.display = 'inline';
+            updateSongInfo("ARRÊT", "");
+        });
+        
+        prevBtn.addEventListener('click', () => {
+            if (isRadioMode || tracks.length === 0) return;
+            const newTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+            playTrack(newTrack);
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            if (isRadioMode || tracks.length === 0) return;
+            const newTrack = (currentTrack + 1) % tracks.length;
+            playTrack(newTrack);
+        });
+        
+        // Gestion du volume
+        volumeControl.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
+        });
+        
+        // Gestion de la barre de recherche
+        audio.addEventListener('timeupdate', () => {
+            if (!isRadioMode && !isNaN(audio.duration)) {
+                seekBar.value = audio.currentTime;
+                seekBar.max = audio.duration;
+            }
+        });
+        
+        seekBar.addEventListener('input', (e) => {
+            if (!isRadioMode) {
+                audio.currentTime = e.target.value;
+            }
+        });
+        
+        // Passage automatique à la piste suivante
+        audio.addEventListener('ended', () => {
+            if (!isRadioMode && tracks.length > 0) {
+                nextBtn.click();
+            }
+        });
+        
+        // Mettre à jour les informations de la chanson
+        function updateSongInfo(artist, title) {
+            artistElement.textContent = artist.toUpperCase();
+            titleElement.textContent = title ? ` - ${title.toUpperCase()}` : "";
+            
+            // Effet glitch sur le changement
+            artistElement.style.animation = 'none';
+            titleElement.style.animation = 'none';
+            void artistElement.offsetWidth;
+            void titleElement.offsetWidth;
+            artistElement.style.animation = 'glitch-anim-1 0.5s linear';
+            titleElement.style.animation = 'glitch-anim-2 0.5s linear';
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            createMatrixEffect();
+            audio.volume = volumeControl.value;
+            
+            // Désactiver la barre de recherche en mode radio
+            audio.addEventListener('play', () => {
+                if (isRadioMode) {
+                    seekBar.disabled = true;
+                    seekBar.value = 0;
+                    seekBar.max = 0;
+                } else {
+                    seekBar.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
